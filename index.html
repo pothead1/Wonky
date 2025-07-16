@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ganjaguru: Your Cosmic Cannabis Concierge</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+    <meta name="theme-color" content="#4CAF50">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic styling for the UI and portals */
+        body {
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars due to physics */
+            font-family: 'Space Mono', monospace; /* Updated font */
+            color: #fff;
+            background-color: #121212; /* Darker, more cosmic background */
+            background-image: radial-gradient(circle at center, #2a003a 0%, #0d001a 100%); /* Subtle gradient */
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.7); /* More opaque */
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5); /* Green glow */
+            border: 1px solid #4CAF50;
+        }
+        #ui h3 {
+            color: #7FFFD4; /* Lighter turquoise */
+            margin-top: 0;
+        }
+        #ui p {
+            font-size: 0.9em;
+            color: #bbb;
+        }
+        #ui button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        #ui button:hover {
+            background-color: #5cb85c;
+            transform: translateY(-2px);
+        }
+
+        /* Console Log Overlay */
+        #console-log {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 150px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 1px solid #4CAF50;
+            border-radius: 8px;
+            color: #00FF00; /* Green text for console */
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8em;
+            padding: 10px;
+            overflow-y: scroll;
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        #console-log div {
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .portal {
+            position: absolute;
+            z-index: 5;
+            cursor: pointer;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 230, 255, 0.7) 0%, rgba(60, 160, 255, 0.5) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 2px solid rgba(139, 230, 255, 0.9);
+            box-shadow: 0 0 15px rgba(60, 160, 255, 0.8);
+            transition: transform 0.2s ease-in-out, background 0.5s ease;
+            animation: portal-glow 3s infinite alternate; /* New: Portal glowing animation */
+        }
+        .portal:hover {
+            transform: scale(1.1);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(139, 230, 255, 0.6) 100%);
+        }
+        .portal-inner img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 5px;
+        }
+        .portal-inner span {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Key binding help */
+        #key-bindings {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            color: #eee;
+            font-size: 0.85em;
+            border: 1px solid #7FFFD4;
+        }
+        #key-bindings ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        #key-bindings li {
+            margin-bottom: 5px;
+        }
+        #key-bindings kbd {
+            display: inline-block;
+            padding: 2px 5px;
+            border: 1px solid #888;
+            border-radius: 3px;
+            background-color: #333;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Styles for the actual islands (HTML divs) */
+        .game-island {
+            position: absolute;
+            z-index: 2; /* Below portals, above canvas */
+            background-color: rgba(50, 50, 50, 0.9); /* Dark semi-transparent background */
+            border: 2px solid #4CAF50; /* Green border */
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.7); /* Green glow */
+            padding: 15px;
+            text-align: center;
+            color: #E0E0E0;
+            font-size: 0.9em;
+            transform-origin: center center; /* Crucial for correct rotation */
+            transition: box-shadow 0.1s ease-out; /* For collision glow */
+            cursor: grab;
+            display: flex; /* Use flexbox for centering content */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .game-island:active {
+            cursor: grabbing;
+        }
+        .game-island.colliding { /* Class added on collision */
+            box-shadow: 0 0 25px 10px #FFC0CB, 0 0 40px #FFC0CB; /* Brighter pink glow */
+        }
+
+        .game-island h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #7FFFD4;
+            font-size: 1.1em;
+        }
+        .game-island img {
+            max-width: 80px;
+            max-height: 80px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .game-island a {
+            color: #90EE90; /* Light green for links */
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .game-island a:hover {
+            text-decoration: underline;
+        }
+        /* Specific sizes/shapes for islands to match Matter.js bodies */
+        #html-island1 {
+            width: 140px; /* Corresponds to a circle of radius 80 */
+            height: 140px;
+            border-radius: 50%; /* Make it circular */
+        }
+        #html-island2 {
+            width: 180px;
+            height: 60px;
+            border-radius: 8px;
+        }
+        #html-island3 {
+            width: 130px; /* Polygon radius 70 is rough, adjust as needed */
+            height: 130px;
+            border-radius: 50%; /* Approximate polygon shape visually */
+        }
+        #html-island4 {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+        }
+        #html-starIsland {
+            width: 100px; /* Polygon radius 50 */
+            height: 100px;
+            border-radius: 10px; /* Not perfectly star-shaped, but good enough */
+            background-color: rgba(255, 69, 0, 0.9); /* Matching color */
+            border-color: #FFA07A;
+            box-shadow: 0 0 15px rgba(255, 69, 0, 0.7);
+        }
+        #html-textBlock {
+            width: 200px;
+            height: 50px;
+            border-radius: 5px;
+            background-color: rgba(173, 216, 230, 0.9); /* Matching color */
+            border-color: #87CEEB;
+            box-shadow: 0 0 15px rgba(173, 216, 230, 0.7);
+        }
+
+
+        /* Animations */
+        @keyframes portal-glow {
+            from { box-shadow: 0 0 15px rgba(60, 160, 255, 0.8), 0 0 25px rgba(60, 160, 255, 0.6); }
+            to { box-shadow: 0 0 25px rgba(60, 160, 255, 1), 0 0 40px rgba(60, 160, 255, 0.8); }
+        }
+
+    </style>
+</head>
+<body>
+	<div id="ui">
+		<h3>Physics Playground</h3>
+		<p>Drag islands. Click portals. Watch the world drift.</p>
+        <button onclick="resetPhysics()">Reset Physics</button>
+        <button onclick="softResetIslands()" style="margin-left: 10px;">Soft Reset</button>
+	</div>
+
+    <div id="console-log">
+        <strong>Activity Log:</strong>
+    </div>
+
+    <div id="key-bindings">
+        <h4>Key Bindings:</h4>
+        <ul>
+            <li><kbd>Spacebar</kbd>: Activate Gravity Field (pulls islands to cursor)</li>
+            <li><kbd>A</kbd>: Add a new Circle Island</li>
+            <li><kbd>B</kbd>: Add a new Rectangular Block</li>
+            <li><kbd>C</kbd>: Clear all dynamic islands</li>
+            <li><kbd>D</kbd>: Toggle Debug Wireframes (Matter.js)</li>
+            <li><kbd>S</kbd>: Soft Reset (repositions islands)</li>
+            <li><kbd>Shift + R</kbd>: Full Physics Reset</li>
+        </ul>
+    </div>
+
+	<div class="portal" id="portal1" style="top:40vh;left:5vw;" onclick="enterPortal('grow-island')">
+		<div class="portal-inner">
+			<img src="/images/icons/grow.svg" alt="Grow Island Portal">
+			<span>Grow Island</span>
+		</div>
+	</div>
+
+	<div class="portal" id="portal2" style="top:70vh;left:80vw;" onclick="enterPortal('shop-dimension')">
+		<div class="portal-inner">
+			<img src="/images/icons/shop.svg" alt="Shop Portal">
+			<span>Shop</span>
+		</div>
+	</div>
+
+    <div class="portal" id="portal3" style="top:10vh;left:50vw;" onclick="enterPortal('ai-chat')">
+		<div class="portal-inner">
+			<img src="/images/icons/chat.svg" alt="AI Chat Portal">
+			<span>AI Chat</span>
+		</div>
+	</div>
+
+    <div class="portal" id="portal4" style="top:55vh;left:30vw;" onclick="enterPortal('design-studio')">
+        <div class="portal-inner">
+            <img src="/images/icons/design.svg" alt="Design Studio Portal">
+            <span>Design Studio</span>
+        </div>
+    </div>
+
+    <div class="portal" id="portal5" style="top:25vh;left:75vw;" onclick="enterPortal('user-profile')">
+        <div class="portal-inner">
+            <img src="/images/icons/profile.svg" alt="User Profile Portal">
+            <span>Profile</span>
+        </div>
+    </div>
+
+    <div class="game-island" id="html-island1">
+        <h4>Strain Explorer</h4>
+        <img src="https://via.placeholder.com/80/7FFFD4/FFFFFF?text=Strain" alt="Strain Icon">
+        <p>Discover new strains and effects.</p>
+        <a href="#strains">Explore</a>
+    </div>
+
+    <div class="game-island" id="html-island2">
+        <h4>Product Creator</h4>
+        <img src="https://via.placeholder.com/80/FF69B4/FFFFFF?text=Product" alt="Product Icon">
+        <p>Design your custom cannabis products.</p>
+        <a href="#create">Design Now</a>
+    </div>
+
+    <div class="game-island" id="html-island3">
+        <h4>Delivery Automation</h4>
+        <img src="https://via.placeholder.com/80/FFD700/FFFFFF?text=Delivery" alt="Delivery Icon">
+        <p>Automate your cannabis deliveries.</p>
+        <a href="#delivery">Schedule</a>
+    </div>
+
+    <div class="game-island" id="html-island4">
+        <h4>AI Guidance</h4>
+        <img src="https://via.placeholder.com/80/8A2BE2/FFFFFF?text=AI" alt="AI Icon">
+        <p>Your personalized cannabis concierge.</p>
+        <a href="#ai">Chat Guru</a>
+    </div>
+
+    <div class="game-island" id="html-starIsland">
+        <h4>Cosmic Cultivation</h4>
+        <img src="https://via.placeholder.com/80/FF4500/FFFFFF?text=Cultivate" alt="Cultivation Icon">
+        <p>Grow your own with AI insights.</p>
+        <a href="#cultivate">Start Growing</a>
+    </div>
+
+    <div class="game-island" id="html-textBlock">
+        <h4>News & Updates</h4>
+        <img src="https://via.placeholder.com/60/ADD8E6/000000?text=News" alt="News Icon">
+        <p>Latest from the Ganjaguru universe.</p>
+        <a href="#news">Read More</a>
+    </div>
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+	<script>
+        // Custom console log to display messages on screen
+        const consoleLog = document.getElementById('console-log');
+        const MAX_LOG_MESSAGES = 10;
+        function customLog(message) {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleLog.prepend(div); // Add to top
+
+            while (consoleLog.children.length > MAX_LOG_MESSAGES + 1) { // +1 for the header
+                consoleLog.removeChild(consoleLog.lastChild);
+            }
+            console.log(message); // Also log to browser console
+        }
+
+		// Aliases for Matter.js modules
+		const {
+			Engine,
+			Render,
+			World,
+			Bodies,
+			Body,
+			Mouse,
+			MouseConstraint,
+			Events,
+			Composite
+		} = Matter;
+
+		// Global variables for engine and render to be accessible by resetPhysics
+		let engine;
+		let render;
+		let islands = [];
+        let boundaries = [];
+        let mouseConstraint;
+        let originalIslandPositions = []; // To store initial positions for soft reset
+
+        // Map Matter.js body labels to their corresponding HTML elements
+        const htmlElements = {
+            "island1": document.getElementById('html-island1'),
+            "island2": document.getElementById('html-island2'),
+            "island3": document.getElementById('html-island3'),
+            "island4": document.getElementById('html-island4'),
+            "starIsland": document.getElementById('html-starIsland'),
+            "textBlock": document.getElementById('html-textBlock')
+        };
+
+        // Function to initialize or reset the physics world
+        function initPhysics() {
+            // Clear existing Matter.js elements if resetting
+            if (engine) {
+                Render.stop(render);
+                Engine.clear(engine);
+                World.clear(world);
+                render.canvas.remove();
+                customLog("Previous physics simulation cleared.");
+            }
+
+            // Create engine and world
+            engine = Engine.create();
+            world = engine.world;
+            world.gravity.y = 0; // Set gravity to zero for a floating effect
+
+            // Create renderer (Matter.js will draw its *own* shapes on this canvas)
+            // We set the background to transparent because our HTML divs will be the visible islands.
+            render = Render.create({
+                element: document.body,
+                engine: engine,
+                options: {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    wireframes: false, // Debugging option, toggled by 'D' key
+                    background: 'transparent', // Make Matter.js background transparent
+                    pixelRatio: window.devicePixelRatio,
+                    // If you want to see the Matter.js wireframes for debugging, set this to true
+                    // and you might want to give the canvas a border or background-color here for visibility
+                }
+            });
+
+            // Floating islands (content blocks)
+            // Note: Matter.js body dimensions roughly correspond to HTML div dimensions
+            islands = [
+                Bodies.circle(300, 220, 70, { restitution: 0.9, frictionAir: 0.02, render: { fillStyle: '#7FFFD4', visible: false }, label: "island1" }), // visible: false hides Matter.js shape
+                Bodies.rectangle(650, 320, 180, 60, { restitution: 0.8, frictionAir: 0.02, render: { fillStyle: '#FF69B4', visible: false }, label: "island2" }),
+                Bodies.polygon(1000, 180, 6, 65, { restitution: 0.95, frictionAir: 0.01, render: { fillStyle: '#FFD700', visible: false }, label: "island3" }),
+                Bodies.rectangle(900, 500, 120, 120, { restitution: 0.7, frictionAir: 0.03, render: { fillStyle: '#8A2BE2', visible: false }, label: "island4" }),
+                Bodies.polygon(window.innerWidth / 2, window.innerHeight / 2, 5, 50, {
+                    restitution: 0.9, frictionAir: 0.01,
+                    render: { fillStyle: '#FF4500', visible: false },
+                    label: "starIsland"
+                }),
+                Bodies.rectangle(150, 600, 200, 50, {
+                    restitution: 0.6, frictionAir: 0.05,
+                    render: { fillStyle: '#ADD8E6', visible: false },
+                    label: "textBlock"
+                })
+            ];
+
+            // Store original positions for reset
+            originalIslandPositions = islands.map(island => ({ x: island.position.x, y: island.position.y }));
+
+
+            // Invisible boundaries (static bodies)
+            boundaries = [
+                Bodies.rectangle(window.innerWidth / 2, -30, window.innerWidth, 60, { isStatic: true, label: "topBoundary", render: { fillStyle: 'transparent' } }),
+                Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 30, window.innerWidth, 60, { isStatic: true, label: "bottomBoundary", render: { fillStyle: 'transparent' } }),
+                Bodies.rectangle(-30, window.innerHeight / 2, 60, window.innerHeight, { isStatic: true, label: "leftBoundary", render: { fillStyle: 'transparent' } }),
+                Bodies.rectangle(window.innerWidth + 30, window.innerHeight / 2, 60, window.innerHeight, { isStatic: true, label: "rightBoundary", render: { fillStyle: 'transparent' } })
+            ];
+
+            // Add everything to the world
+            World.add(world, [...islands, ...boundaries]);
+
+            // Run engine and renderer
+            Engine.run(engine);
+            Render.run(render);
+
+            // Mouse/touch controls for dragging
+            const mouse = Mouse.create(render.canvas);
+            mouseConstraint = MouseConstraint.create(engine, {
+                mouse: mouse,
+                constraint: {
+                    stiffness: 0.3,
+                    render: { visible: false }
+                }
+            });
+            World.add(world, mouseConstraint);
+            render.mouse = mouse;
+
+            customLog("Physics engine initialized.");
+        }
+
+        // Call initPhysics to set up the world on page load
+        initPhysics();
+
+        // --- NEW: Synchronize HTML elements with Matter.js bodies ---
+        Events.on(engine, 'afterUpdate', () => {
+            islands.forEach(body => {
+                const element = htmlElements[body.label];
+                if (element) {
+                    // Adjust position to account for transform-origin (center of element)
+                    const x = body.position.x - element.offsetWidth / 2;
+                    const y = body.position.y - element.offsetHeight / 2;
+                    element.style.transform = `translate(${x}px, ${y}px) rotate(${body.angle}rad)`;
+                }
+            });
+        });
+
+        // Add event listener for mouse constraint end (after dragging)
+        Events.on(mouseConstraint, 'end', (event) => {
+            if (event.body) {
+                customLog(`Island ${event.body.label || event.body.id} dragged.`);
+            }
+        });
+        // --- END NEW ---
+
+        // Gentle drifting: apply small, random forces to all islands
+        // This ensures they are always slightly moving in "anti-gravity"
+        setInterval(() => {
+            islands.forEach(body => {
+                if (!body.isStatic) { // Only apply force to non-static bodies
+                    Body.applyForce(body, body.position, {
+                        x: (Math.random() - 0.5) * 0.0015,
+                        y: (Math.random() - 0.5) * 0.0015
+                    });
+                }
+            });
+        }, 120);
+
+		// Orbital motion: islands slowly rotate around a virtual point
+		setInterval(() => {
+			islands.forEach((body, i) => {
+                if (!body.isStatic) { // Only rotate non-static bodies
+                    const angle = 0.002 * (i % 2 === 0 ? 1 : -1); // alternate directions
+                    Body.rotate(body, angle);
+                }
+			});
+		}, 60);
+
+		// Responsive canvas
+		window.addEventListener('resize', () => {
+            customLog("Window resized. Updating physics boundaries.");
+			render.canvas.width = window.innerWidth;
+			render.canvas.height = window.innerHeight;
+            // When resizing, update boundaries to match new window size
+            World.remove(world, boundaries); // Remove old boundaries
+            boundaries = [ // Recreate boundaries with new dimensions
+                Bodies.rectangle(window.innerWidth / 2, -30, window.innerWidth, 60, { isStatic: true, label: "topBoundary", render: { fillStyle: 'transparent' } }),
+                Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 30, window.innerWidth, 60, { isStatic: true, label: "bottomBoundary", render: { fillStyle: 'transparent' } }),
+                Bodies.rectangle(-30, window.innerHeight / 2, 60, window.innerHeight, { isStatic: true, label: "leftBoundary", render: { fillStyle: 'transparent' } }),
+                Bodies.rectangle(window.innerWidth + 30, window.innerHeight / 2, 60, window.innerHeight, { isStatic: true, label: "rightBoundary", render: { fillStyle: 'transparent' } })
+            ];
+            World.add(world, boundaries); // Add new boundaries
+		});
+
+		// PORTAL INTERACTION: teleport islands or trigger effects
+		function portalJump(island, x, y) {
+			Body.setPosition(island, { x, y });
+			Body.setVelocity(island, { x: 0, y: 0 }); // Stop any lingering velocity
+            Body.setAngularVelocity(island, 0); // Stop any lingering rotation
+            customLog(`Island ${island.label || island.id} teleported.`);
+		}
+
+        // Function to handle portal entries
+        function enterPortal(destination) {
+            customLog(`Entering portal to: ${destination.replace('-', ' ').toUpperCase()}`);
+            alert(`Teleporting to ${destination.replace('-', ' ').toUpperCase()}! (This would lead to a new section/page in a real app)`);
+
+            // Example: Teleport a random non-static island when any portal is clicked
+            const movableIslands = islands.filter(body => !body.isStatic);
+            if (movableIslands.length > 0) {
+                const randomIsland = movableIslands[Math.floor(Math.random() * movableIslands.length)];
+                portalJump(randomIsland, Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+            }
+        }
+
+		// Custom "gravity field": user can pull islands toward cursor by holding spacebar
+		let gravityActive = false;
+		document.addEventListener('keydown', e => {
+			if (e.code === 'Space' && !gravityActive) {
+                gravityActive = true;
+                customLog("Gravity field activated!");
+            } else if (e.key === 'D' || e.key === 'd') { // Toggle debug wireframes
+                render.options.wireframes = !render.options.wireframes;
+                customLog(`Wireframes Toggled: ${render.options.wireframes}`);
+            } else if (e.key === 'C' || e.key === 'c') { // Clear all dynamic islands
+                clearDynamicIslands();
+            } else if ((e.key === 'R' || e.key === 'r') && e.shiftKey) { // Shift + R for reset
+                resetPhysics();
+            }
+		});
+		document.addEventListener('keyup', e => {
+			if (e.code === 'Space') {
+                gravityActive = false;
+                customLog("Gravity field deactivated!");
+            }
+		});
+
+		function attractIslandsToCursor() {
+			if (gravityActive) {
+				const mousePos = mouseConstraint.mouse.position;
+				islands.forEach(body => {
+                    if (!body.isStatic) {
+                        const dx = mousePos.x - body.position.x;
+                        const dy = mousePos.y - body.position.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                        const forceMag = 0.00008 * Math.min(dist / 100, 1);
+                        Body.applyForce(body, body.position, {
+                            x: dx / dist * forceMag,
+                            y: dy / dist * forceMag
+                        });
+                    }
+				});
+			}
+			requestAnimationFrame(attractIslandsToCursor);
+		}
+		attractIslandsToCursor(); // Start the attraction loop
+
+		// Example: trigger a "cosmic wave" (all islands pulse outward) on double-click
+		render.canvas.addEventListener('dblclick', () => {
+            customLog("Cosmic wave triggered!");
+			islands.forEach(body => {
+                if (!body.isStatic) {
+                    Body.applyForce(body, body.position, {
+                        x: (body.position.x - window.innerWidth / 2) * 0.0005,
+                        y: (body.position.y - window.innerHeight / 2) * 0.0005
+                    });
+                }
+			});
+		});
+
+		// Advanced: Add or remove islands dynamically
+		function addIsland() {
+			const newIsland = Bodies.circle(
+				200 + Math.random() * (window.innerWidth - 400),
+				100 + Math.random() * (window.innerHeight - 200),
+				40 + Math.random() * 60, { restitution: 0.85, frictionAir: 0.02, render: { fillStyle: '#' + Math.floor(Math.random() * 16777215).toString(16), visible: false } }
+			);
+            const newHtmlIsland = document.createElement('div');
+            newHtmlIsland.className = 'game-island';
+            newHtmlIsland.id = `html-${newIsland.id}`; // Use Matter.js ID for HTML ID
+            newHtmlIsland.innerHTML = `<h4>New Vortex</h4><p>Explore dynamic content here!</p><a href="#">Enter</a>`;
+            document.body.appendChild(newHtmlIsland);
+
+            // Update htmlElements map
+            htmlElements[newIsland.id] = newHtmlIsland;
+
+			islands.push(newIsland);
+			World.add(world, newIsland);
+            customLog("New circle island added dynamically.");
+		}
+
+        function addBlock() {
+            const newBlock = Bodies.rectangle(
+                200 + Math.random() * (window.innerWidth - 400),
+                100 + Math.random() * (window.innerHeight - 200),
+                80 + Math.random() * 80,
+                30 + Math.random() * 40,
+                {
+                    restitution: 0.7, frictionAir: 0.03,
+                    render: { fillStyle: '#' + Math.floor(Math.random() * 16777215).toString(16), visible: false }
+                }
+            );
+            const newHtmlBlock = document.createElement('div');
+            newHtmlBlock.className = 'game-island';
+            newHtmlBlock.id = `html-${newBlock.id}`; // Use Matter.js ID for HTML ID
+            newHtmlBlock.innerHTML = `<h4>Floating Data</h4><p>Information block.</p><a href="#">View</a>`;
+            document.body.appendChild(newHtmlBlock);
+
+            // Update htmlElements map
+            htmlElements[newBlock.id] = newHtmlBlock;
+
+            islands.push(newBlock);
+            World.add(world, newBlock);
+            customLog("New rectangular block added dynamically.");
+        }
+
+        // New function: Clear all dynamic islands
+        function clearDynamicIslands() {
+            // Remove Matter.js bodies
+            const bodiesToRemove = islands.filter(body => !body.isStatic);
+            bodiesToRemove.forEach(body => {
+                World.remove(world, body);
+            });
+            islands = islands.filter(body => body.isStatic); // Keep only static bodies (boundaries)
+
+            // Remove corresponding HTML elements
+            for (const key in htmlElements) {
+                if (htmlElements.hasOwnProperty(key)) {
+                    const element = htmlElements[key];
+                    // Check if the element's ID starts with 'html-' and is not one of the initial, fixed islands
+                    if (element.id.startsWith('html-') && !['html-island1', 'html-island2', 'html-island3', 'html-island4', 'html-starIsland', 'html-textBlock'].includes(element.id)) {
+                        element.remove();
+                        delete htmlElements[key]; // Remove from map
+                    }
+                }
+            }
+            customLog("All dynamically added islands cleared.");
+        }
+
+        // Function to reset the physics simulation
+        function resetPhysics() {
+            customLog("Initiating full physics simulation reset...");
+            // Remove all existing HTML islands
+            for (const key in htmlElements) {
+                if (htmlElements.hasOwnProperty(key)) {
+                    htmlElements[key].remove();
+                }
+            }
+            // Clear the map
+            Object.keys(htmlElements).forEach(key => delete htmlElements[key]);
+
+            // Reinitialize physics, which will also recreate the initial HTML islands
+            initPhysics();
+
+            // Re-populate htmlElements map for initial islands after re-initialization
+            htmlElements["island1"] = document.getElementById('html-island1');
+            htmlElements["island2"] = document.getElementById('html-island2');
+            htmlElements["island3"] = document.getElementById('html-island3');
+            htmlElements["island4"] = document.getElementById('html-island4');
+            htmlElements["starIsland"] = document.getElementById('html-starIsland');
+            htmlElements["textBlock"] = document.getElementById('html-textBlock');
+
+            customLog("Physics simulation fully reset to initial state.");
+        }
+
+        // Collision events: Make islands "glow" on collision
+        Events.on(engine, 'collisionStart', (event) => {
+            const pairs = event.pairs;
+            pairs.forEach(pair => {
+                const bodyA = pair.bodyA;
+                const bodyB = pair.bodyB;
+
+                // Add collision class to HTML elements
+                const elementA = htmlElements[bodyA.label];
+                const elementB = htmlElements[bodyB.label];
+
+                if (elementA && !bodyA.isStatic) {
+                    elementA.classList.add('colliding');
+                }
+                if (elementB && !bodyB.isStatic) {
+                    elementB.classList.add('colliding');
+                }
+
+                customLog(`Collision detected between ${bodyA.label || bodyA.id} and ${bodyB.label || bodyB.id}`);
+            });
+        });
+
+        Events.on(engine, 'collisionEnd', (event) => {
+            const pairs = event.pairs;
+            pairs.forEach(pair => {
+                const bodyA = pair.bodyA;
+                const bodyB = pair.bodyB;
+
+                // Remove collision class from HTML elements
+                const elementA = htmlElements[bodyA.label];
+                const elementB = htmlElements[bodyB.label];
+
+                if (elementA && !bodyA.isStatic) {
+                    elementA.classList.remove('colliding');
+                }
+                if (elementB && !bodyB.isStatic) {
+                    elementB.classList.remove('colliding');
+                }
+            });
+        });
+
+
+        // Add an example of a "soft reset" (reposition islands to original spots)
+        function softResetIslands() {
+            customLog("Initiating soft reset for islands...");
+            islands.forEach((island, index) => {
+                // Only reset initial islands by label (not dynamically added ones which have numeric IDs)
+                if (island.label && originalIslandPositions[index] && !island.isStatic) {
+                    Body.setPosition(island, originalIslandPositions[index]);
+                    Body.setVelocity(island, { x: 0, y: 0 });
+                    Body.setAngularVelocity(island, 0);
+                }
+            });
+            customLog("Islands soft-reset to original positions.");
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'a' || e.key === 'A') addIsland();
+            if (e.key === 'b' || e.key === 'B') addBlock();
+            if (e.key === 's' || e.key === 'S') softResetIslands(); // New: Soft reset with 'S' key
+        });
+
+		// For further learning and advanced features, check out the Matter.js docs and tutorials.
+	</script>
+</body>
+</html>

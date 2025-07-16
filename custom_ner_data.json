@@ -1,0 +1,131 @@
+{
+  "rasa_nlu_data": {
+    "common_examples": [
+      {
+        "text": "I want to buy some zaza",
+        "intent": "purchase_request",
+        "entities": [
+          {
+            "start": 18,
+            "end": 22,
+            "value": "zaza",
+            "entity": "strain"
+          }
+        ]
+      },
+      {
+        "text": "How much is an eighth of flower?",
+        "intent": "price_query",
+        "entities": [
+          {
+            "start": 15,
+            "end": 21,
+            "value": "eighth",
+            "entity": "quantity"
+          },
+          {
+            "start": 25,
+            "end": 31,
+            "value": "flower",
+            "entity": "product_form"
+          }
+        ]
+      },
+      {
+        "text": "Is the plug available today?",
+        "intent": "availability_check",
+        "entities": [
+          {
+            "start": 7,
+            "end": 11,
+            "value": "plug",
+            "entity": "contact_type"
+          }
+        ]
+      },
+      {
+        "text": "Suggest a good indica strain",
+        "intent": "strain_recommendation",
+        "entities": [
+          {
+            "start": 15,
+            "end": 20,
+            "value": "indica",
+            "entity": "strain_type"
+          }
+        ]
+      },
+      {
+        "text": "Can you explain what twaxing is?",
+        "intent": "slang_definition",
+        "entities": [
+          {
+            "start": 23,
+            "end": 29,
+            "value": "twaxing",
+            "entity": "slang_term"
+          }
+        ]
+      },
+      {
+        "text": "I prefer smoking a blunt",
+        "intent": "consumption_method",
+        "entities": [
+          {
+            "start": 18,
+            "end": 23,
+            "value": "blunt",
+            "entity": "consumption_type"
+          }
+        ]
+      },
+      {
+        "text": "How do I clean my rig?",
+        "intent": "cleaning_tips",
+        "entities": [
+          {
+            "start": 16,
+            "end": 19,
+            "value": "rig",
+            "entity": "equipment"
+          }
+        ]
+      },
+      {
+        "text": "What’s the effect of sativa?",
+        "intent": "effect_query",
+        "entities": [
+          {
+            "start": 18,
+            "end": 24,
+            "value": "sativa",
+            "entity": "strain_type"
+          }
+        ]
+      },
+      {
+        "text": "Give me an eighth of that fire",
+        "intent": "purchase_request",
+        "entities": [
+          {
+            "start": 11,
+	            "end": 17,
+            "value": "eighth",
+            "entity": "quantity"
+          },
+          {
+            "start": 25,
+            "end": 29,
+            "value": "fire",
+            "entity": "strain"
+          }
+        ]
+      },
+      {
+        "text": "I want to take a tolerance break",
+        "intent": "tolerance_break",
+        "entities": []
+      }
+    ]
+  }
+}

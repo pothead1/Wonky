@@ -1,0 +1,77 @@
+[
+    {
+        "id": "kb001",
+        "topic": "Cannabis Strains",
+        "title": "What is the difference between Indica, Sativa, and Hybrid strains?",
+        "content": "Indica strains typically produce relaxing effects and are suited for evening use. Sativa strains are more uplifting and better for daytime use. Hybrid strains combine properties of both and can be tailored to specific needs.",
+        "tags": [
+            "strain",
+            "indica",
+            "sativa",
+            "hybrid",
+            "effects",
+            "usage"
+        ],
+        "updated_at": "2025-07-16T12:39:49.352629"
+    },
+    {
+        "id": "kb002",
+        "topic": "Consumption Methods",
+        "title": "What are the different ways to consume cannabis?",
+        "content": "Common methods include smoking (joints, blunts, pipes), vaping, edibles, tinctures, topicals, dabbing, and capsules. Each method has different onset times and durations.",
+        "tags": [
+            "consumption",
+            "edibles",
+            "vaping",
+            "smoking",
+            "tinctures",
+            "topicals"
+        ],
+        "updated_at": "2025-07-16T12:39:49.352644"
+    },
+    {
+        "id": "kb003",
+        "topic": "Cannabinoids",
+        "title": "What are THC and CBD?",
+        "content": "THC (tetrahydrocannabinol) is the primary psychoactive component of cannabis, while CBD (cannabidiol) is non-psychoactive and known for its therapeutic properties. They interact differently with the body's endocannabinoid system.",
+        "tags": [
+            "thc",
+            "cbd",
+            "cannabinoids",
+            "effects",
+            "science"
+        ],
+        "updated_at": "2025-07-16T12:39:49.352649"
+    },
+    {
+        "id": "kb004",
+        "topic": "Terpenes",
+        "title": "How do terpenes affect cannabis experience?",
+        "content": "Terpenes are aromatic compounds found in cannabis and other plants. They contribute to the flavor and effects of cannabis. Examples include myrcene (sedating), limonene (uplifting), and linalool (calming).",
+        "tags": [
+            "terpenes",
+            "aroma",
+            "flavor",
+            "effects",
+            "myrcene",
+            "limonene",
+            "linalool"
+        ],
+        "updated_at": "2025-07-16T12:39:49.352654"
+    },
+    {
+        "id": "kb005",
+        "topic": "Legal & Compliance",
+        "title": "Is cannabis legal in my area?",
+        "content": "Cannabis legality varies by country, state, and even city. Check your local regulations for possession limits, age restrictions, medical use laws, and whether recreational use is allowed.",
+        "tags": [
+            "law",
+            "legal",
+            "compliance",
+            "state regulations",
+            "medical",
+            "recreational"
+        ],
+        "updated_at": "2025-07-16T12:39:49.352658"
+    }
+]
